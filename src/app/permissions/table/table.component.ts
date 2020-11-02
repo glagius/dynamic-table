@@ -6,15 +6,13 @@ import { Observable, Subscription, Subject } from 'rxjs';
   selector: 'app-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableComponent implements OnInit, OnDestroy {
   @Input() data$: Observable<PermissionResponse[]>;
   @Output() changedData: EventEmitter<Permission[]> = new EventEmitter();
 
-  public tableData$: Subject<TableData> = new Subject();
+  public tableData: TableData;
   private subscriptions$: Subscription = new Subscription();
-  public tableRowModel: { [key: string]: { [permission: string]: PermissionType } };
   constructor() { }
 
   ngOnInit(): void {
@@ -27,8 +25,7 @@ export class TableComponent implements OnInit, OnDestroy {
         // FIXME: it must take list of permissions from api;
         const headers = this.getHeaders(usersInfo[0].permissions);
         const rows = usersInfo.map(user => this.createTableRow(user.permissions, user.name));
-        this.tableData$.next({ headers, rows });
-        this.createTableModel(usersInfo);
+        this.tableData = { headers, rows };
         console.warn('TableInfo = ', { headers, rows });
       })
     );
@@ -50,14 +47,5 @@ export class TableComponent implements OnInit, OnDestroy {
   }
   sortPermissions(coll: Permission[]): Permission[] {
     return [...coll].sort((a, b) => a.name !== b.name ? a.name < b.name ? -1 : 1 : 0);
-  }
-
-  createTableModel(data: PermissionResponse[]): void {
-    this.tableRowModel = data.reduce((acc, res) => {
-      const { name, permissions } = res;
-      const mapping = permissions.reduce((iAcc, p) => ({ ...iAcc, [p.name]: p.status.value }), {});
-      return { ...acc, [name]: mapping };
-    }, {});
-    console.log('TableModel = ', this.tableRowModel);
   }
 }
