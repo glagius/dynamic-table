@@ -21,9 +21,6 @@ const routes: Routes = [
   {
     path: 'sdpermissions', component: SdpermissionsComponent, canActivate: [PermissionAccessGuard]
   },
-  {
-    path: '**', component: AppComponent,
-  }
 ];
 
 const MaterilModules = [
