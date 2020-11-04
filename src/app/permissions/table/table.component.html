@@ -5,6 +5,7 @@
   <ng-container *ngFor="let header of tableData.headers"
                 [matColumnDef]="header">
     <th mat-header-cell
+        [class]="{'text-center': header === 'roles'}"
         *matHeaderCellDef> {{ header | uppercase }} </th>
     <ng-template [ngIf]="header === 'user'"
                  [ngIfElse]="select">
@@ -13,12 +14,14 @@
     </ng-template>
     <ng-template #select>
       <td mat-cell
+          class="border-unset"
           *matCellDef="let element">
         <mat-form-field>
           <mat-select [disabled]="element[header] === 'DISABLED'"
+                      (selectionChange)="saveChanges(element)"
                       [value]="element[header]"
                       placeholder="Select">
-            <mat-option *ngFor="let option of element.options"
+            <mat-option *ngFor="let option of options[header]"
                         [value]="option">
               {{ option }}
             </mat-option>

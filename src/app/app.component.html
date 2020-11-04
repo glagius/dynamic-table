@@ -1,12 +1,36 @@
 <label id="example-radio-group-label">Select your role</label>
 <mat-radio-group aria-labelledby="example-radio-group-label"
-                 [value]="role$ | async">
+                 *ngIf="user$ | async as selectedUser"
+                 [value]="selectedUser.name">
   <mat-radio-button class="example-radio-button"
-                    *ngFor="let role of roles"
-                    (click)="toggleRole(role)"
-                    [value]="role">
-    {{role | uppercase}}
+                    *ngFor="let user of (users$ | async)"
+                    (click)="toggleUser(user)"
+                    [value]="user.name">
+    {{user.name | uppercase}}
   </mat-radio-button>
+  <div>Your current role is: {{ selectedUser.name }}</div>
+  <ul>
+    <div>User permissions:</div>
+    <li *ngFor="let permission of checkPermissions(selectedUser.permissions)">
+      {{ permission.name }} - {{ permission.status.value }}
+      <ng-template #link
+                   [ngIf]="permission.name === 'roles'">
+        <a routerLink="/roles">Go to Roles</a>
+      </ng-template>
+      <ng-template #link
+                   [ngIf]="permission.name === 'sdPermissions'">
+        <a routerLink="/sdpermissions">Go to SD_Permissions</a>
+      </ng-template>
+      <ng-template #link
+                   [ngIf]="permission.name === 'lhPermissions'">
+        <a routerLink="/lhpermissions">Go to LH_Permissions</a>
+      </ng-template>
+    </li>
+  </ul>
 </mat-radio-group>
-<div>Your current role is: {{role$ | async}}</div>
-<app-table [data$]="permissions$"></app-table>
+<div>If the user role is Admin, all columns in the table will be shown.</div>
+<div></div>
+<div></div>
+<app-table [data$]="permissions$"
+           [options]="permissionOptions"></app-table>
+<router-outlet></router-outlet>

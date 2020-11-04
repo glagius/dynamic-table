@@ -17,6 +17,7 @@ export enum PermissionType {
  * API response for User data
  */
 export interface PermissionResponse {
+  userId: number;
   name: string;
   permissions: Permission[];
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiHandlerService } from './permissions/api-handler.service';
-import { Role } from './permissions/types';
+import { Role, PermissionResponse, Permission, PermissionType } from './permissions/types';
 
 
 @Component({
@@ -14,16 +14,23 @@ export class AppComponent implements OnInit {
     private service: ApiHandlerService
   ) { }
 
-  public role$ = this.service.getRole();
-  public roles = [Role.ADMIN, Role.USER, Role.GUEST];
+  public user$ = this.service.getUser();
+  public users$ = this.service.getUsers();
   public permissions$ = this.service.permissionResponse$;
+  public permissionOptions;
 
   title = 'permissions-table';
 
   ngOnInit(): void {
     this.service.getPermissions();
+    this.permissionOptions = this.service.getPermissionOptions();
   }
-  toggleRole(role: Role): void {
-    this.service.setRole(role);
+  toggleUser(user: PermissionResponse): void {
+    this.service.setUser(user);
+  }
+  // TODO: create as a pipe
+  checkPermissions(coll: Permission[]): Permission[] {
+    // return coll.filter(p => p.status.value !== PermissionType.DISABLED);
+    return coll;
   }
 }

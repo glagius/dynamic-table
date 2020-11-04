@@ -1,33 +1,151 @@
 import { Injectable } from '@angular/core';
 import { Permission, PermissionType, Role, PermissionResponse } from './types';
-import { BehaviorSubject, Subject, of } from 'rxjs';
+import { BehaviorSubject, Subject, of, Observable } from 'rxjs';
 import { switchMap, delay, tap } from 'rxjs/operators';
 
-// const permissionTypes: PermissionType = {
-//   edit: PermissionType.EDIT,
-//   view: PermissionType.VIEW,
-//   hidden: PermissionType.HIDDEN,
-//   disabled: PermissionType.DISABLED
-// };
+const permissionOtions = [
+  {
+    name: 'fetchPOSData',
+    data: [
+      {
+        status: 'VIEW'
+      },
+      {
+        status: 'EDIT'
+      },
+      {
+        status: 'DISABLED'
+      }
+    ]
+  },
+  {
+    name: 'setScreens',
+    data: [
+      {
+        status: 'EDIT'
+      },
+      {
+        status: 'VIEW'
+      },
+      {
+        status: 'HIDDEN'
+      },
+      {
+        status: 'DISABLED'
+      }
+    ]
+  },
+  {
+    name: 'roles',
+    data: [
+      {
+        status: 'EDIT'
+      },
+      {
+        status: 'VIEW'
+      },
+      {
+        status: 'HIDDEN'
+      },
+      {
+        status: 'DISABLED'
+      }
+    ]
+  },
+  {
+    name: 'sdPermissions',
+    data: [
+      {
+        status: 'EDIT'
+      },
+      {
+        status: 'VIEW'
+      },
+      {
+        status: 'HIDDEN'
+      },
+      {
+        status: 'DISABLED'
+      }
+    ]
+  },
+  {
+    name: 'lhPermissions',
+    data: [
+      {
+        status: 'EDIT'
+      },
+      {
+        status: 'VIEW'
+      },
+      {
+        status: 'HIDDEN'
+      },
+      {
+        status: 'DISABLED'
+      }
+    ]
+  },
+  {
+    name: 'notifyUsers',
+    data: [
+      {
+        status: 'EDIT'
+      },
+      {
+        status: 'VIEW'
+      },
+      {
+        status: 'HIDDEN'
+      },
+      {
+        status: 'DISABLED'
+      }
+    ]
+  },
+  {
+    name: 'sandDollarsLog',
+    data: [
+      {
+        status: 'EDIT'
+      },
+      {
+        status: 'VIEW'
+      },
+      {
+        status: 'HIDDEN'
+      },
+      {
+        status: 'DISABLED'
+      }
+    ]
+  }
+];
+
 const users = [
   {
     name: 'Gleb',
+    userId: 1,
     role: Role.ADMIN,
   },
   {
     name: 'Rol',
+    userId: 2,
     role: Role.USER,
   },
   {
     name: 'Ella',
+    userId: 3,
     role: Role.USER,
   },
   {
     name: 'Victory',
+    userId: 4,
     role: Role.GUEST,
   },
   {
     name: 'Stas',
+    userId: 5,
     role: Role.GUEST,
   }
 ];
@@ -81,33 +199,38 @@ const createPermissions = (role: Role): Permission[] => {
   providedIn: 'root'
 })
 export class ApiHandlerService {
-
-  private user$: BehaviorSubject<Role> = new BehaviorSubject(Role.ADMIN);
-  public permissionResponse$: Subject<PermissionResponse[]> = new Subject();
   constructor() { }
 
-  setRole(role: Role): void {
-    this.user$.next(role);
+  private user$: BehaviorSubject<PermissionResponse> = new BehaviorSubject(null);
+  private users$: BehaviorSubject<PermissionResponse[]> = new BehaviorSubject([]);
+  public permissionResponse$: BehaviorSubject<PermissionResponse[]> = new BehaviorSubject(null);
+
+  setUser(user: PermissionResponse): void {
+    this.user$.next(user);
   }
-  getRole(): Readonly<BehaviorSubject<Role>> {
+  getUser(): Subject<PermissionResponse> {
     return this.user$;
   }
-
-  getPermissions(): void {
-    this.user$
-      .pipe(
-        switchMap(role => {
-          const fakeResponse: PermissionResponse[] = users.map(user => ({
-            name: user.name,
-            permissions: createPermissions(user.role)
-          }));
-          return of(fakeResponse);
-        }),
-        delay(1000),
-      )
-      .subscribe(coll => this.permissionResponse$.next(coll));
+  getUsers(): Readonly<BehaviorSubject<PermissionResponse[]>> {
+    return this.users$;
   }
-
+  getPermissions(): void {
+    const fakeResponse: PermissionResponse[] = users.map(user => ({
+      name: user.name,
+      userId: user.userId,
+      permissions: createPermissions(user.role)
+    }));
+    this.permissionResponse$.next(fakeResponse);
+    this.users$.next(fakeResponse);
+    this.user$.next(fakeResponse[0]);
+  }
+  getPermissionOptions(): any {
+    return permissionOtions.reduce((acc, permission) => {
+      const { name, data } = permission;
+      const options = data.map(option => option.status);
+      return { ...acc, [name]: options };
+    }, {});
+  }
   // setPermissions(permissions: Permission[]): void {
   //   this.permissionResponse$.next(permissions);
   // }
